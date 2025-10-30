@@ -18,6 +18,7 @@ export const AlbumTableHeader = memo(() => {
         TableHeaderComponents.Artists,
         TableHeaderComponents.Space,
         TableHeaderComponents.Time,
+        TableHeaderComponents.ISRC,
         TableHeaderComponents.Space,
       ]}
     />

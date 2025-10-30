@@ -32,30 +32,49 @@ const getAvailableDevices = async () => {
  * @description Start a new context or resume current playback on the user's active device. This API only works for users who have Spotify Premium. The order of execution is not guaranteed when you use this API with other Player API endpoints.
  */
 const startPlayback = async (
-  body: { context_uri?: string; uris?: string[]; offset?: { position: number } } = {}
+  body: { context_uri?: string; uris?: string[]; offset?: { position: number } } = {},
+  deviceId?: string
 ) => {
-  await axios.put('/me/player/play', body);
+  try {
+    const params = deviceId ? { device_id: deviceId } : {};
+    await axios.put('/me/player/play', body, { params });
+  } catch (error: any) {
+    if (error?.response?.status === 404) {
+      console.warn('No active device found. Please ensure a device is active and try again.');
+    }
+    throw error;
+  }
 };
 
 /**
  * @description Pause playback on the user's account. This API only works for users who have Spotify Premium. The order of execution is not guaranteed when you use this API with other Player API endpoints.
  */
-const pausePlayback = async () => {
-  await axios.put('/me/player/pause');
+const pausePlayback = async (deviceId?: string) => {
+  try {
+    const params = deviceId ? { device_id: deviceId } : {};
+    await axios.put('/me/player/pause', {}, { params });
+  } catch (error: any) {
+    if (error?.response?.status === 404) {
+      console.warn('No active device found. Cannot pause playback.');
+    }
+    throw error;
+  }
 };
 
 /**
- * @description Skip to the next track in the user’s queue. This API only works for users who have Spotify Premium. The order of execution is not guaranteed when you use this API with other Player API endpoints.
+ * @description Skip to the next track in the user's queue. This API only works for users who have Spotify Premium. The order of execution is not guaranteed when you use this API with other Player API endpoints.
  */
-const nextTrack = async () => {
-  await axios.post('/me/player/next');
+const nextTrack = async (deviceId?: string) => {
+  const params = deviceId ? { device_id: deviceId } : {};
+  await axios.post('/me/player/next', {}, { params });
 };
 
 /**
- * @description Skip to the previous track in the user’s queue. This API only works for users who have Spotify Premium. The order of execution is not guaranteed when you use this API with other Player API endpoints.
+ * @description Skip to the previous track in the user's queue. This API only works for users who have Spotify Premium. The order of execution is not guaranteed when you use this API with other Player API endpoints.
  */
-const previousTrack = async () => {
-  await axios.post('/me/player/previous');
+const previousTrack = async (deviceId?: string) => {
+  const params = deviceId ? { device_id: deviceId } : {};
+  await axios.post('/me/player/previous', {}, { params });
 };
 
 /**

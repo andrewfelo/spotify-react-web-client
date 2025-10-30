@@ -69,7 +69,7 @@ const SpotifyContainer: FC<{ children: any }> = memo(({ children }) => {
     if (tokenInLocalStorage) {
       dispatch(authActions.fetchUser());
     } else {
-      dispatch(loginToSpotify(true));
+      dispatch(loginToSpotify(false));
     }
   }, [dispatch]);
 
@@ -207,6 +207,7 @@ const RootComponent = () => {
   const user = useAppSelector((state) => !!state.auth.user);
   const language = useAppSelector((state) => state.language.language);
   const playing = useAppSelector((state) => !state.spotify.state?.paused);
+  const deviceId = useAppSelector((state) => state.spotify.deviceId);
 
   useEffect(() => {
     document.documentElement.setAttribute('lang', language);
@@ -221,11 +222,13 @@ const RootComponent = () => {
       e.stopPropagation();
       if (e.key === ' ' || e.code === 'Space' || e.keyCode === 32) {
         e.preventDefault();
-        const request = !playing ? playerService.startPlayback() : playerService.pausePlayback();
+        const request = !playing 
+          ? playerService.startPlayback({}, deviceId || undefined) 
+          : playerService.pausePlayback(deviceId || undefined);
         request.then().catch(() => {});
       }
     },
-    [playing]
+    [playing, deviceId]
   );
 
   useEffect(() => {

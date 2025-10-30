@@ -69,6 +69,14 @@ const Time = (props: ItemProps) => {
   );
 };
 
+const ISRC = (props: ItemProps) => {
+  return (
+    <div style={{ flex: 2 }} className='tablet-hidden'>
+      <h3 className='column-name text-right'>ISRC</h3>
+    </div>
+  );
+};
+
 const Space = (props: ItemProps) => {
   return <div style={{ flex: 1 }} className='tablet-hidden'></div>;
 };
@@ -97,6 +105,7 @@ export const TableHeaderComponents = {
   Title,
   Artists,
   Time,
+  ISRC,
   Space,
   Album,
   DateAdded,

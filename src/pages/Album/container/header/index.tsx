@@ -20,7 +20,7 @@ import { sumTracksLength } from '../../../../utils/spotify/sumTracksLength';
 import { ARTISTS_DEFAULT_IMAGE } from '../../../../constants/spotify';
 
 // Interfaces
-import { RefObject, useEffect, useState, type FC } from 'react';
+import { RefObject, useCallback, useEffect, useState, type FC } from 'react';
 
 interface AlbumHeaderProps {
   color: string;
@@ -37,10 +37,24 @@ export const AlbumHeader: FC<AlbumHeaderProps> = ({ container, sectionContainer,
   const [headerWidth, setHeaderWidth] = useState(0);
   const [activeTable, setActiveTable] = useState(false);
   const [activeHeader, setActiveHeader] = useState(false);
+  const [copiedUPC, setCopiedUPC] = useState(false);
 
   const rightLayoutOpen = useAppSelector(isRightLayoutOpen);
   const tracks = useAppSelector((state) => state.album.tracks);
   const libraryCollapsed = useAppSelector((state) => state.ui.libraryCollapsed);
+
+  const copyUPCToClipboard = useCallback(async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!album?.external_ids?.upc) return;
+    
+    try {
+      await navigator.clipboard.writeText(album.external_ids.upc);
+      setCopiedUPC(true);
+      setTimeout(() => setCopiedUPC(false), 2000);
+    } catch (err) {
+      console.error('Failed to copy UPC:', err);
+    }
+  }, [album?.external_ids?.upc]);
 
   useEffect(() => {
     const ref = container.current;
@@ -142,6 +156,23 @@ export const AlbumHeader: FC<AlbumHeaderProps> = ({ container, sectionContainer,
                       {sumTracksLength(tracks)}
                     </span>
                   </h3>
+                  {album?.external_ids?.upc && (
+                    <p 
+                      className='text-sm' 
+                      style={{ 
+                        color: 'rgba(255, 255, 255, 0.7)', 
+                        marginTop: 4,
+                        cursor: 'pointer',
+                        transition: 'color 0.2s'
+                      }}
+                      onClick={copyUPCToClipboard}
+                      onMouseEnter={(e) => e.currentTarget.style.color = 'rgba(255, 255, 255, 0.9)'}
+                      onMouseLeave={(e) => e.currentTarget.style.color = 'rgba(255, 255, 255, 0.7)'}
+                      title={copiedUPC ? 'Copied!' : 'Click to copy UPC'}
+                    >
+                      UPC: {copiedUPC ? '✓ Copied' : album.external_ids.upc}
+                    </p>
+                  )}
                 </Space>
               </Col>
             </Row>

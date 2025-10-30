@@ -10,6 +10,11 @@ export interface Album {
   /** @description The markets in which the album is available: ISO 3166-1 alpha-2 country codes. NOTE: an album is considered available in a market when at least 1 of its tracks is available in that market. */
   available_markets: string[];
 
+  /** @description Known external IDs for the album. */
+  external_ids?: {
+    upc?: string;
+  };
+
   /** @description Known external URLs for this album. */
   external_urls: {
     spotify: string;

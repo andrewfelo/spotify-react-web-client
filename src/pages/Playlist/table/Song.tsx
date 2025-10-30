@@ -45,6 +45,7 @@ export const Song = (props: SongProps) => {
         SongViewComponents.AddedAt,
         (props) => <SongViewComponents.AddToLiked {...props} onLikeRefresh={toggleLike} />,
         SongViewComponents.Time,
+        SongViewComponents.ISRC,
         SongViewComponents.Actions,
       ]}
     />

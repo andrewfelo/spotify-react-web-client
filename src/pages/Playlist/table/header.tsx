@@ -17,6 +17,7 @@ export const PlaylistTableHeader = () => {
         TableHeaderComponents.DateAdded,
         TableHeaderComponents.Space,
         TableHeaderComponents.Time,
+        TableHeaderComponents.ISRC,
         TableHeaderComponents.Space,
       ]}
     />

@@ -1,6 +1,6 @@
 import { Tooltip } from 'antd';
 import ReactTimeAgo from 'react-time-ago';
-import { useCallback, useMemo } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { MenuIcon, Pause, Play } from '../Icons';
 import { TrackActionsWrapper } from '../Actions/TrackActions';
 
@@ -272,6 +272,61 @@ const Time = ({ song }: ComponentProps) => {
   );
 };
 
+const ISRC = ({ song }: ComponentProps) => {
+  const [isrc, setIsrc] = useState<string | null>(song.external_ids?.isrc || null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(false);
+  const [copied, setCopied] = useState(false);
+
+  const loadISRC = useCallback(async () => {
+    if (isrc || loading || error) return;
+    
+    setLoading(true);
+    try {
+      const { tracksService } = await import('../../services/tracks');
+      const fullTrack = await tracksService.getTrack(song.id);
+      setIsrc(fullTrack.external_ids?.isrc || null);
+    } catch (err) {
+      console.error('Error loading ISRC:', err);
+      setError(true);
+    } finally {
+      setLoading(false);
+    }
+  }, [song.id, isrc, loading, error]);
+
+  const copyToClipboard = useCallback(async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!isrc) return;
+    
+    try {
+      await navigator.clipboard.writeText(isrc);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      console.error('Failed to copy:', err);
+    }
+  }, [isrc]);
+
+  return (
+    <p 
+      className='text-right tablet-hidden' 
+      style={{ 
+        flex: 2, 
+        fontSize: '0.875rem', 
+        color: 'rgba(255, 255, 255, 0.7)', 
+        cursor: isrc ? 'pointer' : 'default',
+        paddingLeft: '16px',
+        transition: 'color 0.2s'
+      }}
+      onMouseEnter={loadISRC}
+      onClick={copyToClipboard}
+      title={copied ? 'Copied!' : (isrc ? 'Click to copy ISRC' : (loading ? 'Loading...' : error ? 'Error loading ISRC' : 'Hover to load ISRC'))}
+    >
+      {loading ? '...' : copied ? '✓ Copied' : isrc || '—'}
+    </p>
+  );
+};
+
 const Index = ({
   index,
   isCurrent,
@@ -385,4 +440,5 @@ export const SongViewComponents = {
   AddToLiked,
   Actions,
   Time,
+  ISRC,
 };
